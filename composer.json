@@ -19,7 +19,7 @@
     "require": {
         "contao/core": ">=3.2,<4-dev",
         "tijsverkoyen/css-to-inline-styles": "~1.5",
-        "heimrichhannot/haste_plus": ">=1.0.0",
+        "heimrichhannot/contao-haste_plus": ">=1.0.0",
         "bariew/phpquery": ">=1.0.2"
     },
     "autoload": {

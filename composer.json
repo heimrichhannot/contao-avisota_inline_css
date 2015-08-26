@@ -19,8 +19,8 @@
     "require": {
         "contao/core": ">=3.2,<4-dev",
         "tijsverkoyen/css-to-inline-styles": "~1.5",
-        "heimrichhannot/haste_plus": "1.x",
-        "bariew/phpquery": "1.x"
+        "heimrichhannot/haste_plus": "1.*",
+        "bariew/phpquery": "1.*"
     },
     "autoload": {
         "classmap": [""]

@@ -1,3 +1,3 @@
-# Haste Plus
+# Avisota Inline Css
 
-An extension for the contao haste module.
+Extends the avisota newsletter system with inlining css.

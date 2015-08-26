@@ -20,7 +20,7 @@
         "contao/core": ">=3.2,<4-dev",
         "tijsverkoyen/css-to-inline-styles": "~1.5",
         "heimrichhannot/haste_plus": "1.x",
-        "coderockr/php-query": "dev-master#0e14558ff60b4733a1e102224bb9eadb2be0711c" // not cleanly in composer, yet
+        "coderockr/php-query": "dev-master#0e14558ff60b4733a1e102224bb9eadb2be0711c"
     },
     "autoload": {
         "classmap": [""]
@@ -33,3 +33,4 @@
         }
     }
 }
+

@@ -1,6 +1,6 @@
 <?php
 
-namespace HeimrichHannot\XAvisotaInlineCss;
+namespace HeimrichHannot\AvisotaInlineCss;
 
 use Avisota\Contao\Message\Core\Event\PostRenderMessageContentEvent;
 use Avisota\Contao\Message\Core\Event\RenderMessageContentEvent;
@@ -15,7 +15,7 @@ class AvisotaInlineCss extends \Frontend
 
 	public static function removeExternalCss(PostRenderMessageContentEvent $objEvent)
 	{
-		if (Environment::getUrl() != 'preview')
+		if (Environment::getUrlBasename() != 'preview')
 		{
 			$strContent = $objEvent->getContent();
 
@@ -110,10 +110,9 @@ class AvisotaInlineCss extends \Frontend
 		global $objPage;
 		if ($objPage)
 		{
-			$objController = \System::importStatic('Controller');
 			$strContent = $objEvent->getRenderedContent();
 			$strContent = str_replace(array('%7B%7B', '%7D%7D'), array('{{', '}}'), $strContent);
-			$objEvent->setRenderedContent($objController->replaceInsertTags($strContent));
+			$objEvent->setRenderedContent(\Controller::replaceInsertTags($strContent));
 		}
 	}
 

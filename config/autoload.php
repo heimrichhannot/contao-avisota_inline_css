@@ -3,11 +3,9 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (c) 2005-2014 Leo Feyer
+ * Copyright (c) 2005-2015 Leo Feyer
  *
- * @package Xavisota_inline_css
- * @link    https://contao.org
- * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @license LGPL-3.0+
  */
 
 
@@ -26,5 +24,5 @@ ClassLoader::addNamespaces(array
 ClassLoader::addClasses(array
 (
 	// Classes
-	'HeimrichHannot\XAvisotaInlineCss\XAvisotaInlineCss' => 'system/modules/xavisota_inline_css/classes/XAvisotaInlineCss.php',
+	'HeimrichHannot\AvisotaInlineCss\AvisotaInlineCss' => 'system/modules/avisota_inline_css/classes/AvisotaInlineCss.php',
 ));

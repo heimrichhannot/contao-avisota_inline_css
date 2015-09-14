@@ -4,6 +4,7 @@ namespace HeimrichHannot\AvisotaInlineCss;
 
 use Avisota\Contao\Message\Core\Event\PostRenderMessageContentEvent;
 use Avisota\Contao\Message\Core\Event\RenderMessageContentEvent;
+use HeimrichHannot\HastePlus\DOM;
 use HeimrichHannot\HastePlus\Environment;
 use HeimrichHannot\HastePlus\Files;
 
@@ -69,13 +70,8 @@ class AvisotaInlineCss extends \Frontend
 
 			if (!empty($arrInlineStylesheetContents))
 			{
-				$strContent = $objEvent->getContent();
-
-				// apply the css inliner
-				$objCssInliner = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles($strContent,
-					implode(' ', $arrInlineStylesheetContents));
-
-				$objEvent->setContent($objCssInliner->convert());
+				$objEvent->setContent(DOM::convertToInlineCss($objEvent->getContent(),
+					implode(' ', $arrInlineStylesheetContents)));
 			}
 		}
 	}

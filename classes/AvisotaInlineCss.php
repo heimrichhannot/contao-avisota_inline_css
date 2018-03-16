@@ -11,105 +11,128 @@ use HeimrichHannot\HastePlus\Files;
 class AvisotaInlineCss extends \Frontend
 {
 
-	const AVISOTA_CSS_MODE_INLINE = 'inline';
-	const AVISOTA_CSS_MODE_HEADER = 'header';
+    const AVISOTA_CSS_MODE_INLINE = 'inline';
+    const AVISOTA_CSS_MODE_HEADER = 'header';
 
-	public static function removeExternalCss(PostRenderMessageContentEvent $objEvent)
-	{
-		if (Environment::getUrlBasename() != 'preview')
-		{
-			$strContent = $objEvent->getContent();
+    public static function removeExternalCss(PostRenderMessageContentEvent $objEvent)
+    {
+        if (Environment::getUrlBasename() != 'preview')
+        {
+            $strContent = $objEvent->getContent();
 
-			// remove existing link-elements
-			$doc = \phpQuery::newDocumentHTML($strContent);
+            // remove existing link-elements
+            $doc = \phpQuery::newDocumentHTML($strContent);
 
-			foreach (pq('html > head > link') as $link) {
-				pq($link)->remove();
-			}
+            foreach (pq('html > head > link') as $link)
+            {
+                pq($link)->remove();
+            }
 
-			$objEvent->setContent($doc->htmlOuter());
-		}
-	}
+            $objEvent->setContent($doc->htmlOuter());
+        }
+    }
 
-	public static function addHeaderCss(PostRenderMessageContentEvent $objEvent)
-	{
-		if (Environment::getUrlBasename() != 'preview')
-		{
-			$arrHeaderStylesheetContents =
-				static::getStylesheetContents($objEvent->getMessage()->getLayout(), static::AVISOTA_CSS_MODE_HEADER);
+    public static function addHeaderCss(PostRenderMessageContentEvent $objEvent)
+    {
+        if (Environment::getUrlBasename() != 'preview')
+        {
+            $arrHeaderStylesheetContents = static::getStylesheetContents($objEvent->getMessage()->getLayout(), static::AVISOTA_CSS_MODE_HEADER);
 
-			if (!empty($arrHeaderStylesheetContents))
-			{
-				$strContent = $objEvent->getContent();
+            if (!empty($arrHeaderStylesheetContents))
+            {
+                $strContent = $objEvent->getContent();
 
-				$doc = \phpQuery::newDocumentHTML($strContent);
+                $doc = \phpQuery::newDocumentHTML($strContent);
 
-				pq('html > head')->append(sprintf('<style type="text/css">%s</style>', implode(' ',
-					$arrHeaderStylesheetContents)));
+                pq('html > head')->append(
+                    sprintf(
+                        '<style type="text/css">%s</style>',
+                        implode(
+                            ' ',
+                            $arrHeaderStylesheetContents
+                        )
+                    )
+                );
 
-				$objEvent->setContent($doc->htmlOuter());
-			}
-		}
-	}
+                // prepare links for outlook
+                foreach (pq('a') as $a) {
+                    pq($a)->wrapInner('<span><font color="#009ee3"></font></span>');
+                }
 
-	// some mail clients can't handle margin'ed p elements :-(
-	public static function convertPToBr(PostRenderMessageContentEvent $objEvent)
-	{
-		if (Environment::getUrlBasename() != 'preview')
-		{
-			$objEvent->setContent(preg_replace('@</p>[\n\r\s]*<p>@i', '<br><br>', $objEvent->getContent()));
-		}
-	}
+                // salutation
+                foreach (pq('.mce_salutation') as $a) {
+                    pq($a)->wrapInner('<span><font color="#009ee3"></font></span>');
+                }
 
-	public static function convertToInlineCss(PostRenderMessageContentEvent $objEvent)
-	{
-		if (Environment::getUrlBasename() != 'preview')
-		{
-			$arrInlineStylesheetContents =
-				static::getStylesheetContents($objEvent->getMessage()->getLayout(), static::AVISOTA_CSS_MODE_INLINE);
+                $objEvent->setContent($doc->htmlOuter());
+            }
+        }
+    }
 
-			if (!empty($arrInlineStylesheetContents))
-			{
-				$objEvent->setContent(DOM::convertToInlineCss($objEvent->getContent(),
-					implode(' ', $arrInlineStylesheetContents)));
-			}
-		}
-	}
+    // some mail clients can't handle margin'ed p elements :-(
+    public static function convertPToBr(PostRenderMessageContentEvent $objEvent)
+    {
+        if (Environment::getUrlBasename() != 'preview')
+        {
+            $objEvent->setContent(preg_replace('@</p>[\n\r\s]*<p>@i', '<br><br>', $objEvent->getContent()));
+        }
+    }
 
-	public static function getStylesheetPaths($objLayout, $strMode)
-	{
-		$arrStylesheets = ($strMode == static::AVISOTA_CSS_MODE_INLINE ?
-		  $objLayout->getInlineStylesheets() : $objLayout->getHeaderStylesheets());
+    public static function convertToInlineCss(PostRenderMessageContentEvent $objEvent)
+    {
+        if (Environment::getUrlBasename() != 'preview')
+        {
+            $arrInlineStylesheetContents = static::getStylesheetContents($objEvent->getMessage()->getLayout(), static::AVISOTA_CSS_MODE_INLINE);
 
-		if (!empty($arrStylesheets))
-		{
-			$arrStylesheetPaths = array_map(function($strUuid) {
-				$strPath = TL_ROOT . '/' . Files::getPathFromUuid($strUuid);
+            if (!empty($arrInlineStylesheetContents))
+            {
+                $objEvent->setContent(
+                    DOM::convertToInlineCss(
+                        $objEvent->getContent(),
+                        implode(' ', $arrInlineStylesheetContents)
+                    )
+                );
+            }
+        }
+    }
 
-				return (file_exists($strPath) ? $strPath : '');
-			}, $arrStylesheets);
+    public static function getStylesheetPaths($objLayout, $strMode)
+    {
+        $arrStylesheets = ($strMode == static::AVISOTA_CSS_MODE_INLINE ? $objLayout->getInlineStylesheets() : $objLayout->getHeaderStylesheets());
 
-			// remove non-found stylesheets
-			return array_filter($arrStylesheetPaths);
-		}
+        if (!empty($arrStylesheets))
+        {
+            $arrStylesheetPaths = array_map(
+                function ($strUuid)
+                {
+                    $strPath = TL_ROOT . '/' . Files::getPathFromUuid($strUuid);
 
-		return array();
-	}
+                    return (file_exists($strPath) ? $strPath : '');
+                },
+                $arrStylesheets
+            );
 
-	public static function getStylesheetContents($objLayout, $strMode)
-	{
-		return array_map('file_get_contents', static::getStylesheetPaths($objLayout, $strMode));
-	}
+            // remove non-found stylesheets
+            return array_filter($arrStylesheetPaths);
+        }
 
-	public static function replaceInsertTagsOnlineView(RenderMessageContentEvent $objEvent)
-	{
-		global $objPage;
-		if ($objPage)
-		{
-			$strContent = $objEvent->getRenderedContent();
-			$strContent = str_replace(array('%7B%7B', '%7D%7D'), array('{{', '}}'), $strContent);
-			$objEvent->setRenderedContent(\Controller::replaceInsertTags($strContent));
-		}
-	}
+        return [];
+    }
+
+    public static function getStylesheetContents($objLayout, $strMode)
+    {
+        return array_map('file_get_contents', static::getStylesheetPaths($objLayout, $strMode));
+    }
+
+    public static function replaceInsertTagsOnlineView(RenderMessageContentEvent $objEvent)
+    {
+        global $objPage;
+        if ($objPage)
+        {
+            $strContent = $objEvent->getRenderedContent();
+            $strContent = str_replace(['%7B%7B', '%7D%7D'], ['{{', '}}'], $strContent);
+            $objEvent->setRenderedContent(\Controller::replaceInsertTags($strContent));
+        }
+    }
 
 }
